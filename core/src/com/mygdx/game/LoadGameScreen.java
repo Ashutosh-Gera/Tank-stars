@@ -16,21 +16,19 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
-public class SelectScreen extends ScreenAdapter {
+public class LoadGameScreen extends ScreenAdapter {
 
     TankStarsGame game;
 
     OrthographicCamera camera;
-    Texture screenImg;
-
-    Texture[] tankImgs = new Texture[3];
-    Music screenBgm;
+    Texture loadImg;
+    Music loadBgm;
     Stage stage;
-    Skin selectSkin;
+    Skin loadSkin;
     //Label outputLabel;
 
 
-    public SelectScreen(TankStarsGame game) {
+    public LoadGameScreen(TankStarsGame game) {
         this.game = game;
 
         //setting the camera
@@ -38,20 +36,16 @@ public class SelectScreen extends ScreenAdapter {
         camera.setToOrtho(false, 800, 480);
 
         //textures
-        screenImg = new Texture(Gdx.files.internal("selectTank.png"));
-        screenBgm = Gdx.audio.newMusic(Gdx.files.internal("selectBgm.mp3"));
-        tankImgs[0] = new Texture(Gdx.files.internal("heliosTank.png"));
-        tankImgs[1] = new Texture(Gdx.files.internal("spectreTank.png"));
-        tankImgs[2] = new Texture(Gdx.files.internal("blazerTank.png"));
-
+        loadImg = new Texture(Gdx.files.internal("selectTank.png"));
+        loadBgm = Gdx.audio.newMusic(Gdx.files.internal("selectBgm.mp3"));
 
         //loop the music
-        screenBgm.setLooping(true);
-        screenBgm.play();
+        loadBgm.setLooping(true);
+        loadBgm.play();
 
         //stage for buttons
         stage = new Stage(new ScreenViewport());
-        selectSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+        loadSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
     }
 
     @Override
@@ -59,29 +53,16 @@ public class SelectScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(stage);
 
-        Button chooseTank = new TextButton("CHOOSE TANK", selectSkin, "small");
-        chooseTank.setSize(200, 50);
-        chooseTank.setPosition(550, 370);
-        chooseTank.setColor(Color.BLACK);
-        stage.addActor(chooseTank);
+        Button chooseGame = new TextButton("CHOOSE SAVED\nGAME", loadSkin, "small");
+        chooseGame.setSize(200, 50);
+        chooseGame.setPosition(550, 370);
+        chooseGame.setColor(Color.BLACK);
+        stage.addActor(chooseGame);
 
-        /*Button playButton = new TextButton("PLAY :D", selectSkin, "small");
-        playButton.setSize(150, 75);
-        playButton.setPosition(575, 60);
-        playButton.addListener(new ClickListener(){
-
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
-            }
-
-        });
-        stage.addActor(playButton); */
-
-        Button playHelios = new TextButton("PLAY\nHELIOS", selectSkin, "small");
-        playHelios.setSize(125, 50);
-        playHelios.setPosition(665, 270);
-        playHelios.addListener(new ClickListener(){
+        Button firstButton = new TextButton("Game ONE", loadSkin, "small");
+        firstButton.setSize(150, 50);
+        firstButton.setPosition(575, 270);
+        firstButton.addListener(new ClickListener(){
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -89,25 +70,12 @@ public class SelectScreen extends ScreenAdapter {
             }
 
         });
-        stage.addActor(playHelios);
+        stage.addActor(firstButton);
 
-        Button playSpectre = new TextButton("PLAY\nSPECTRE", selectSkin, "small");
-        playSpectre.setSize(125, 50);
-        playSpectre.setPosition(665, 180);
-        playSpectre.addListener(new ClickListener(){
-
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
-            }
-
-        });
-        stage.addActor(playSpectre);
-
-        Button playBlazer = new TextButton("PLAY\nBLAZER", selectSkin, "small");
-        playBlazer.setSize(125, 50);
-        playBlazer.setPosition(665, 90);
-        playBlazer.addListener(new ClickListener(){
+        Button secondButton = new TextButton("Game TWO", loadSkin, "small");
+        secondButton.setSize(150, 50);
+        secondButton.setPosition(575, 200);
+        secondButton.addListener(new ClickListener(){
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -115,10 +83,35 @@ public class SelectScreen extends ScreenAdapter {
             }
 
         });
-        stage.addActor(playBlazer);
+        stage.addActor(secondButton);
 
+        Button thirdButton = new TextButton("Game THREE", loadSkin, "small");
+        thirdButton.setSize(150, 50);
+        thirdButton.setPosition(575, 130);
+        thirdButton.addListener(new ClickListener(){
 
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new BattleScreen(game));
+            }
+
+        });
+        stage.addActor(thirdButton);
+
+        Button fourthButton = new TextButton("Game FOUR", loadSkin, "small");
+        fourthButton.setSize(150, 50);
+        fourthButton.setPosition(575, 60);
+        fourthButton.addListener(new ClickListener(){
+
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new BattleScreen(game));
+            }
+
+        });
+        stage.addActor(fourthButton);
     }
+
 
     @Override
     public void render(float delta) {
@@ -128,10 +121,7 @@ public class SelectScreen extends ScreenAdapter {
         camera.update();
 
         game.batch.begin();
-        game.batch.draw(screenImg, 0, 0);
-        game.batch.draw(tankImgs[0], 565, 270);
-        game.batch.draw(tankImgs[1], 565, 180);
-        game.batch.draw(tankImgs[2], 565, 90);
+        game.batch.draw(loadImg, 0, 0);
         game.batch.end();
 
         stage.act(delta);
@@ -139,17 +129,40 @@ public class SelectScreen extends ScreenAdapter {
 
     }
 
+
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
-        screenBgm.stop();
+        dispose();
+        loadBgm.stop();
     }
 
     @Override
     public void dispose() {
-        screenImg.dispose();
+        loadImg.dispose();
         stage.dispose();
-        selectSkin.dispose();
+        loadSkin.dispose();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

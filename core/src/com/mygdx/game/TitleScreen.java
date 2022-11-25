@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class TitleScreen extends ScreenAdapter{
 
-    final tankStarsGame game;
+    TankStarsGame game;
 
     OrthographicCamera camera;
     Texture titleImg;
@@ -27,7 +27,7 @@ public class TitleScreen extends ScreenAdapter{
     //Label outputLabel;
 
 
-    public TitleScreen(tankStarsGame game) {
+    public TitleScreen(TankStarsGame game) {
         this.game = game;
         //setting the camera
         camera = new OrthographicCamera();
@@ -63,9 +63,13 @@ public class TitleScreen extends ScreenAdapter{
 
         Gdx.input.setInputProcessor(stage);
 
-        final Button playButton = new TextButton("Play 1 v 1", playSkin,"small");
+        final Button playButton = new TextButton("New Game (1 v 1)", playSkin,"small");
         playButton.setSize(200,75);
-        playButton.setPosition(550, 200);
+        playButton.setPosition(550, 250);
+
+        final Button resumeButton = new TextButton("Resume Saved\nGame", playSkin, "small");
+        resumeButton.setSize(200, 75);
+        resumeButton.setPosition(550, 150);
 
         /*playButton.addListener(new InputListener(){
             @Override
@@ -80,6 +84,12 @@ public class TitleScreen extends ScreenAdapter{
                 return true;
             }
         });*/
+        resumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new LoadGameScreen(game));
+            }
+        });
 
         playButton.addListener(new ClickListener() {
             @Override
@@ -89,6 +99,7 @@ public class TitleScreen extends ScreenAdapter{
 
         });
         stage.addActor(playButton);
+        stage.addActor(resumeButton);
     }
 
     @Override

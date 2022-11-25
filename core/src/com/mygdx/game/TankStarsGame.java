@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
-public class tankStarsGame extends Game {
+public class TankStarsGame extends Game {
 	SpriteBatch batch;
 	ShapeRenderer shapeRenderer;
 	BitmapFont font;
 
+	//Tank[] tanks = new Tank(2);
+	//float[] terrainInfp;
 	//Stage stage;
 
 	@Override
