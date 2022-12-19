@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.particles.values.RectangleSpawnShapeValue;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.EarClippingTriangulator;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -41,8 +43,8 @@ public class BattleScreen extends ScreenAdapter {
     Texture leftHealth;
     Texture rightHealth;
 
-    Texture leftTank;
-    Texture rightTank;
+    Texture leftTank; Fixture leftTankFixture;
+    Texture rightTank; Fixture rightTankFixture;
 
     Skin pauseSkin;
     public BattleScreen(TankStarsGame game) {
@@ -93,9 +95,6 @@ public class BattleScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(stage);
 
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(0, 0);
         float[] arr = generateGroundVertices(0);//{0,0,100,0,100,100,90,100,80,100,70,100,0,100};
 
         PolygonShape groundShape = new PolygonShape();
@@ -113,8 +112,14 @@ public class BattleScreen extends ScreenAdapter {
 
         groundShape.set(arr);
 
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(0, 0);
+
+        ChainShape ground = new ChainShape();
+        ground.createChain(arr);
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = groundShape;
+        fixtureDef.shape = ground;
         fixtureDef.friction = .6f;
         fixtureDef.restitution = 0;
 
@@ -132,6 +137,30 @@ public class BattleScreen extends ScreenAdapter {
             }
         });
         stage.addActor(pauseButton);
+
+        CircleShape circleShape = new CircleShape();
+        circleShape.setRadius(0.1f);
+
+        // Add tank
+        BodyDef leftTankDef = new BodyDef();
+        leftTankDef.type = BodyDef.BodyType.DynamicBody;
+        leftTankDef.position.set(200,110);
+        FixtureDef tankFixDef = new FixtureDef();
+        tankFixDef.shape = circleShape;
+        tankFixDef.friction = .6f;
+        tankFixDef.restitution = 0;
+        leftTankFixture = world.createBody(leftTankDef).createFixture(tankFixDef);
+
+        // Add tank
+        BodyDef rightTankDef = new BodyDef();
+        rightTankDef.type = BodyDef.BodyType.DynamicBody;
+        rightTankDef.position.set(600,110);
+        FixtureDef rightTankFixDef = new FixtureDef();
+        rightTankFixDef.shape = circleShape;
+        rightTankFixDef.friction = .6f;
+        rightTankFixDef.restitution = 0;
+        rightTankFixture = world.createBody(rightTankDef).createFixture(rightTankFixDef);
+        circleShape.dispose();
     }
 
     @Override
@@ -147,10 +176,13 @@ public class BattleScreen extends ScreenAdapter {
         game.batch.begin();
         game.batch.draw(leftHealth, 0, 434);
         game.batch.draw(rightHealth, 600, 434);
-        game.batch.draw(leftTank, 200, 100);
-        game.batch.draw(rightTank, 600, 100);
+
+        game.batch.draw(leftTank, leftTankFixture.getBody().getPosition().x, leftTankFixture.getBody().getPosition().y);
+        game.batch.draw(rightTank, rightTankFixture.getBody().getPosition().x, rightTankFixture.getBody().getPosition().y);
         game.batch.end();
         stage.act(delta);
         stage.draw();
+
+        world.step(1/60f, 16, 6);
     }
 }
