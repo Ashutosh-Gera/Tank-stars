@@ -49,7 +49,6 @@ public class BattleScreen extends ScreenAdapter {
     Skin pauseSkin;
     public BattleScreen(TankStarsGame game) {
         this.game = game;
-
         //setting the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
