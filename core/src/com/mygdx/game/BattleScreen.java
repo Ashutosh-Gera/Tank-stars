@@ -51,7 +51,7 @@ public class BattleScreen extends ScreenAdapter  {
     private Body tankBodies[] = new Body[2];
     private Fixture cannonFix; private Body cannonBody;
 
-    int turn = 0; // turn of tank, 0 for left, 1 for right
+    private int turn = 0; // turn of tank, 0 for left, 1 for right
 
     Skin pauseSkin;
 
@@ -78,7 +78,6 @@ public class BattleScreen extends ScreenAdapter  {
     private float[] generateGroundVertices(int X){
         //int A = 100, B = 80, C = 110;
         float[] vertices = new float[14];
-        int y;
         vertices[0] = X;
         vertices[1] = 0;
         vertices[2] = X+800;
@@ -119,7 +118,7 @@ public class BattleScreen extends ScreenAdapter  {
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 float rel_x = x - tankX;
                 float rel_y = y - tankY;
-                float impulse_coeff = 2;
+                float impulse_coeff = 10;
                 CircleShape circleShape = new CircleShape();
                 circleShape.setRadius(5f);
                 BodyDef cannon = new BodyDef();
@@ -131,9 +130,13 @@ public class BattleScreen extends ScreenAdapter  {
                 cannonFixDef.restitution = 0;
                 cannonBody = world.createBody(cannon);
                 cannonFix = cannonBody.createFixture(cannonFixDef);
+                cannonBody.setGravityScale(2);
 
-                cannonBody.applyLinearImpulse(rel_x/impulse_coeff,rel_y/impulse_coeff, tankX, tankY, false);
+                cannonBody.applyLinearImpulse(rel_x*impulse_coeff,rel_y*impulse_coeff, tankX+10, tankY+10, false);
                 circleShape.dispose();
+
+                turn = 1 - turn;
+                tanks[turn].boostFuel();
             }
         });
 
@@ -142,12 +145,15 @@ public class BattleScreen extends ScreenAdapter  {
             @Override
             public boolean keyDown(InputEvent event, int keycode)
             {
+                if (tanks[turn].getFuel() < 0){
+                    return true;
+                }
                 float tankX = tankFixtures[turn].getBody().getPosition().x;
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 if (keycode == 21){
-                    tankBodies[turn].applyForce(-800,0, tankX, tankY, false);
+                    tankBodies[turn].applyForce(-6000,-1000, tankX, tankY, true);
                 } else if (keycode == 22){
-                    tankBodies[turn].applyForce(800,0, tankX, tankY, false);
+                    tankBodies[turn].applyForce(6000,-1000, tankX, tankY, true);
                 }
                 return true;
             }
@@ -157,7 +163,16 @@ public class BattleScreen extends ScreenAdapter  {
             @Override
             public void beginContact(Contact contact) {
                 if (contact.getFixtureA() == cannonFix || contact.getFixtureB() == cannonFix){
+                    for (int i=0; i<2; i++){
+                        float rel_x = cannonFix.getBody().getPosition().x - tankFixtures[i].getBody().getPosition().x;
+                        float rel_y = cannonFix.getBody().getPosition().y - tankFixtures[i].getBody().getPosition().y;
+                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y);
+                        if (tanks[i].getHealth() < 0){
+                            System.out.println(i + " Lost");
+                        }
+                    }
                     cannonBody = null;
+
                 }
             }
 
@@ -196,23 +211,27 @@ public class BattleScreen extends ScreenAdapter  {
         BodyDef leftTankDef = new BodyDef();
         leftTankDef.type = BodyDef.BodyType.DynamicBody;
         leftTankDef.position.set(200,110);
+        tanks[0].setPosition(200, 110);
         FixtureDef tankFixDef = new FixtureDef();
         tankFixDef.shape = circleShape;
-        tankFixDef.friction = 0f;
+        tankFixDef.friction = 5f;
         tankFixDef.restitution = 0;
         tankBodies[0] = world.createBody(leftTankDef);
         tankFixtures[0] = tankBodies[0].createFixture(tankFixDef);
+        tankBodies[0].setGravityScale(10);
 
         // Add tank
         BodyDef rightTankDef = new BodyDef();
         rightTankDef.type = BodyDef.BodyType.DynamicBody;
         rightTankDef.position.set(600,110);
+        tanks[1].setPosition(600, 110);
         FixtureDef rightTankFixDef = new FixtureDef();
         rightTankFixDef.shape = circleShape;
         rightTankFixDef.friction = 0.6f;
         rightTankFixDef.restitution = 0;
         tankBodies[1] = world.createBody(rightTankDef);
         tankFixtures[1] = tankBodies[1].createFixture(rightTankFixDef);
+        tankBodies[1].setGravityScale(10);
         circleShape.dispose();
     }
 
@@ -262,7 +281,6 @@ public class BattleScreen extends ScreenAdapter  {
         game.batch.begin();
         game.batch.draw(healths[0], 0, 434);
         game.batch.draw(healths[1], 600, 434);
-
         game.batch.draw(tankTextures[0], tankFixtures[0].getBody().getPosition().x, tankFixtures[0].getBody().getPosition().y);
         game.batch.draw(tankTextures[1], tankFixtures[1].getBody().getPosition().x, tankFixtures[1].getBody().getPosition().y);
         game.batch.end();
@@ -283,7 +301,7 @@ public class BattleScreen extends ScreenAdapter  {
 
         int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
-        tanks[turn].setPosition(tankX, tankY);
+        tanks[turn].changePosition(tankX, tankY);
         world.step(1/60f, 100, 100);
     }
 }
