@@ -2,10 +2,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
 import com.badlogic.gdx.graphics.g2d.PolygonSprite;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
@@ -31,6 +28,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.lang.Math;
 
+import static java.lang.Math.max;
+
 // Currently after clicking the "Play :D" button we get this BattleScreen file open
 // Make this working and the static GUI part would be completed !!
 public class BattleScreen extends ScreenAdapter  {
@@ -45,7 +44,8 @@ public class BattleScreen extends ScreenAdapter  {
     private PolygonSprite groundPolygonSprite;
     private PolygonSpriteBatch groundPolygonSpriteBatch;
 
-    private Texture[] healths = new Texture[2];
+    private ShapeRenderer[] healths = new ShapeRenderer[2];
+    private ShapeRenderer[] fuels = new ShapeRenderer[2];
     private Texture[] tankTextures = new Texture[2];
     private Fixture[] tankFixtures = new Fixture[2];
     private Body tankBodies[] = new Body[2];
@@ -67,9 +67,6 @@ public class BattleScreen extends ScreenAdapter  {
         camera.setToOrtho(false, 800, 480);
         stage = new Stage(new ScreenViewport());
         pauseSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
-
-        healths[0] = new Texture(Gdx.files.internal("leftHealth.png"));
-        healths[1] = new Texture(Gdx.files.internal("rightHealth.png"));
 
         tankTextures[0] = new Texture(Gdx.files.internal(tanks[0].getTankImage()));
         tankTextures[1] = new Texture(Gdx.files.internal(tanks[1].getTankImage()));
@@ -108,6 +105,13 @@ public class BattleScreen extends ScreenAdapter  {
 
         createGround();
 
+        healths[0] = new ShapeRenderer();
+        healths[1] = new ShapeRenderer();
+
+        fuels[0] = new ShapeRenderer();
+        fuels[1] = new ShapeRenderer();
+
+
         final Button pauseButton = new TextButton("Pause", pauseSkin, "small");
         pauseButton.setSize(100, 45);
         pauseButton.setPosition(350, 435);
@@ -115,6 +119,9 @@ public class BattleScreen extends ScreenAdapter  {
         stage.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (cannonBody != null){
+                    return;
+                }
                 float tankX = tankFixtures[turn].getBody().getPosition().x;
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 float rel_x = x - tankX;
@@ -176,14 +183,13 @@ public class BattleScreen extends ScreenAdapter  {
                         float tankY = tankFixtures[i].getBody().getPosition().y;
                         float rel_x = cannonFix.getBody().getPosition().x - tankX;
                         float rel_y = cannonFix.getBody().getPosition().y - tankY;
-                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y);
+                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y, tanks[turn].getDestructionPower());
                         int direction = rel_x > 0? 1:-1;
                         if (-100 < rel_x && rel_x < 100){
                             tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
                             tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
                         }
 
-                        //tankBodies[i].applyLinearImpulse(1000*direction,-1000, tankX, tankY, true);
                         if (tanks[i].getHealth() < 0){
                             System.out.println(i + " Lost");
                         }
@@ -262,7 +268,6 @@ public class BattleScreen extends ScreenAdapter  {
         }
 
         PolygonShape groundShape = new PolygonShape();
-        ShapeRenderer groundFill = new ShapeRenderer();
         groundPolygonSpriteBatch = new PolygonSpriteBatch();
         Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pix.setColor(77 / 255f, 130 / 255f, 4 / 255f,1);
@@ -301,12 +306,11 @@ public class BattleScreen extends ScreenAdapter  {
         groundPolygonSprite.draw(groundPolygonSpriteBatch);
         groundPolygonSpriteBatch.end();
 
-        game.batch.begin();
-        game.batch.draw(healths[0], 0, 434);
-        game.batch.draw(healths[1], 600, 434);
-        game.batch.draw(tankTextures[0], tankFixtures[0].getBody().getPosition().x, tankFixtures[0].getBody().getPosition().y);
-        game.batch.draw(tankTextures[1], tankFixtures[1].getBody().getPosition().x, tankFixtures[1].getBody().getPosition().y);
-        game.batch.end();
+        game.getBatch().begin();
+
+        game.getBatch().draw(tankTextures[0], tankFixtures[0].getBody().getPosition().x, tankFixtures[0].getBody().getPosition().y);
+        game.getBatch().draw(tankTextures[1], tankFixtures[1].getBody().getPosition().x, tankFixtures[1].getBody().getPosition().y);
+        game.getBatch().end();
         stage.act(delta);
         stage.draw();
 
@@ -325,6 +329,27 @@ public class BattleScreen extends ScreenAdapter  {
         int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
         tanks[turn].changePosition(tankX, tankY);
+
+        healths[0].begin(ShapeRenderer.ShapeType.Filled);
+        healths[0].setColor(Color.FIREBRICK);
+        healths[0].rect(0, 434, max(200*tanks[0].getHealth()/tanks[0].getMaxHealth(),0), 60);
+        healths[0].end();
+
+        healths[1].begin(ShapeRenderer.ShapeType.Filled);
+        healths[1].setColor(Color.FIREBRICK);
+        healths[1].rect(600, 434, max(200*tanks[1].getHealth()/tanks[1].getMaxHealth(),0), 60);
+        healths[1].end();
+
+        fuels[0].begin(ShapeRenderer.ShapeType.Filled);
+        fuels[0].setColor(Color.ORANGE);
+        fuels[0].rect(0, 374, max(200*tanks[0].getFuel()/tanks[0].getMaxFuel(),0), 60);
+        fuels[0].end();
+
+        fuels[1].begin(ShapeRenderer.ShapeType.Filled);
+        fuels[1].setColor(Color.ORANGE);
+        fuels[1].rect(600, 374, max(200*tanks[1].getFuel()/tanks[1].getMaxFuel(), 0), 60);
+        fuels[1].end();
+
         world.step(1/60f, 100, 100);
         if (destroyCannon){
             cannonBody.destroyFixture(cannonFix);

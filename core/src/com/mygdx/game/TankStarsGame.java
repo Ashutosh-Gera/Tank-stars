@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 
 public class TankStarsGame extends Game {
-	SpriteBatch batch;
-	ShapeRenderer shapeRenderer;
-	BitmapFont font;
+	private SpriteBatch batch;
+	private ShapeRenderer shapeRenderer;
+	private BitmapFont font;
 	private GameData gameData = new GameData();
 
-	//Tank[] tanks = new Tank(2);
-	//float[] terrainInfp;
-	//Stage stage;
+	public SpriteBatch getBatch() {
+		return batch;
+	}
 
 	@Override
 	public void create () {

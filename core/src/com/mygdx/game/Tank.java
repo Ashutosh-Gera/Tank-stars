@@ -39,11 +39,19 @@ public abstract class Tank {
         this.position = new int[]{x, y};
     }
 
-    public void reduceHealth(float distance) {
-        this.health -= this.destructionPower / distance;
+    public void reduceHealth(float distance, int destructionPower) {
+        this.health -= destructionPower / distance;
     }
 
     public int getDestructionPower() {
         return this.destructionPower;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    public int getMaxFuel() {
+        return maxFuel;
     }
 }

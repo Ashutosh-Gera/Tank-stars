@@ -16,7 +16,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public class PauseScreen extends ScreenAdapter {
 
@@ -50,7 +53,9 @@ public class PauseScreen extends ScreenAdapter {
 
     public void saveGame(){
         try{
-            FileOutputStream file = new FileOutputStream("abc");
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+            Date date = new Date(System.currentTimeMillis());
+            FileOutputStream file = new FileOutputStream(formatter.format(date));
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(this.game.getGameData());
             out.close();
@@ -94,9 +99,9 @@ public class PauseScreen extends ScreenAdapter {
         //tell the camera to update its matrices
         camera.update();
 
-        game.batch.begin();
-        game.batch.draw(pauseImg, 0, 0);
-        game.batch.end();
+        game.getBatch().begin();
+        game.getBatch().draw(pauseImg, 0, 0);
+        game.getBatch().end();
 
         stage.act(delta);
         stage.draw();

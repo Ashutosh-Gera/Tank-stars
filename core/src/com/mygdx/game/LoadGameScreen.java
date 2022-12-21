@@ -18,13 +18,12 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LoadGameScreen extends ScreenAdapter {
 
-    TankStarsGame game;
-
-    OrthographicCamera camera;
-    Texture loadImg;
-    Music loadBgm;
-    Stage stage;
-    Skin loadSkin;
+    private TankStarsGame game;
+    private OrthographicCamera camera;
+    private Texture loadImg;
+    private Music loadBgm;
+    private Stage stage;
+    private Skin loadSkin;
     //Label outputLabel;
 
 
@@ -120,9 +119,9 @@ public class LoadGameScreen extends ScreenAdapter {
 
         camera.update();
 
-        game.batch.begin();
-        game.batch.draw(loadImg, 0, 0);
-        game.batch.end();
+        game.getBatch().begin();
+        game.getBatch().draw(loadImg, 0, 0);
+        game.getBatch().end();
 
         stage.act(delta);
         stage.draw();

@@ -18,16 +18,16 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class SelectScreen extends ScreenAdapter {
 
-    TankStarsGame game;
+    private TankStarsGame game;
 
-    OrthographicCamera camera;
-    Texture screenImg;
+    private OrthographicCamera camera;
+    private Texture screenImg;
 
-    Texture[] tankImgs = new Texture[3];
-    Music screenBgm;
-    Stage stage;
-    Skin selectSkin;
-    GameData gameData;
+    private Texture[] tankImgs = new Texture[3];
+    private Music screenBgm;
+    private Stage stage;
+    private Skin selectSkin;
+    private GameData gameData;
     //Label outputLabel;
 
 
@@ -171,12 +171,12 @@ public class SelectScreen extends ScreenAdapter {
 
         camera.update();
 
-        game.batch.begin();
-        game.batch.draw(screenImg, 0, 0);
-        game.batch.draw(tankImgs[0], 565, 270);
-        game.batch.draw(tankImgs[1], 565, 180);
-        game.batch.draw(tankImgs[2], 565, 90);
-        game.batch.end();
+        game.getBatch().begin();
+        game.getBatch().draw(screenImg, 0, 0);
+        game.getBatch().draw(tankImgs[0], 565, 270);
+        game.getBatch().draw(tankImgs[1], 565, 180);
+        game.getBatch().draw(tankImgs[2], 565, 90);
+        game.getBatch().end();
 
         stage.act(delta);
         stage.draw();

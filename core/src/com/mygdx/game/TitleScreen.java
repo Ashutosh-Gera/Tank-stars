@@ -17,13 +17,13 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class TitleScreen extends ScreenAdapter{
 
-    TankStarsGame game;
+    private TankStarsGame game;
 
-    OrthographicCamera camera;
-    Texture titleImg;
-    Music titleBgm;
-    Stage stage;
-    Skin playSkin;
+    private OrthographicCamera camera;
+    private Texture titleImg;
+    private Music titleBgm;
+    private Stage stage;
+    private Skin playSkin;
     //Label outputLabel;
 
 
@@ -110,9 +110,9 @@ public class TitleScreen extends ScreenAdapter{
         //tell the camera to update its matrices
         camera.update();
 
-        game.batch.begin();
-        game.batch.draw(titleImg, 0, 0);
-        game.batch.end();
+        game.getBatch().begin();
+        game.getBatch().draw(titleImg, 0, 0);
+        game.getBatch().end();
 
         stage.act(delta);
         stage.draw();
