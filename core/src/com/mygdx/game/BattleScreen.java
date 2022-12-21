@@ -1,5 +1,6 @@
 package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -31,7 +33,7 @@ import java.lang.Math;
 
 // Currently after clicking the "Play :D" button we get this BattleScreen file open
 // Make this working and the static GUI part would be completed !!
-public class BattleScreen extends ScreenAdapter {
+public class BattleScreen extends ScreenAdapter  {
 
     private TankStarsGame game;
     private Tank[] tanks;
@@ -46,15 +48,18 @@ public class BattleScreen extends ScreenAdapter {
     private Texture[] healths = new Texture[2];
     private Texture[] tankTextures = new Texture[2];
     private Fixture[] tankFixtures = new Fixture[2];
+    private Body tankBodies[] = new Body[2];
     private Fixture cannonFix; private Body cannonBody;
 
     int turn = 0; // turn of tank, 0 for left, 1 for right
 
     Skin pauseSkin;
+
+
     public BattleScreen(TankStarsGame game) {
         this.game = game;
         GameData gameData = game.getGameData();
-        Tank[] tanks = gameData.getTanks();
+        this.tanks = gameData.getTanks();
 
         //setting the camera
         camera = new OrthographicCamera();
@@ -64,7 +69,7 @@ public class BattleScreen extends ScreenAdapter {
 
         healths[0] = new Texture(Gdx.files.internal("leftHealth.png"));
         healths[1] = new Texture(Gdx.files.internal("rightHealth.png"));
-        System.out.println(tanks[0].getTankImage());
+
         tankTextures[0] = new Texture(Gdx.files.internal(tanks[0].getTankImage()));
         tankTextures[1] = new Texture(Gdx.files.internal(tanks[1].getTankImage()));
 
@@ -119,7 +124,7 @@ public class BattleScreen extends ScreenAdapter {
                 circleShape.setRadius(5f);
                 BodyDef cannon = new BodyDef();
                 cannon.type = BodyDef.BodyType.DynamicBody;
-                cannon.position.set(tankX,tankY);
+                cannon.position.set(tankX+10,tankY+10);
                 FixtureDef cannonFixDef = new FixtureDef();
                 cannonFixDef.shape = circleShape;
                 cannonFixDef.friction = .6f;
@@ -131,6 +136,47 @@ public class BattleScreen extends ScreenAdapter {
                 circleShape.dispose();
             }
         });
+
+        stage.addListener(new InputListener()
+        {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode)
+            {
+                float tankX = tankFixtures[turn].getBody().getPosition().x;
+                float tankY = tankFixtures[turn].getBody().getPosition().y;
+                if (keycode == 21){
+                    tankBodies[turn].applyForce(-800,0, tankX, tankY, false);
+                } else if (keycode == 22){
+                    tankBodies[turn].applyForce(800,0, tankX, tankY, false);
+                }
+                return true;
+            }
+        });
+
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                if (contact.getFixtureA() == cannonFix || contact.getFixtureB() == cannonFix){
+                    cannonBody = null;
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+
+            }
+        });
+
 
         pauseButton.addListener(new ClickListener() {
             @Override
@@ -152,9 +198,10 @@ public class BattleScreen extends ScreenAdapter {
         leftTankDef.position.set(200,110);
         FixtureDef tankFixDef = new FixtureDef();
         tankFixDef.shape = circleShape;
-        tankFixDef.friction = .6f;
+        tankFixDef.friction = 0f;
         tankFixDef.restitution = 0;
-        tankFixtures[0] = world.createBody(leftTankDef).createFixture(tankFixDef);
+        tankBodies[0] = world.createBody(leftTankDef);
+        tankFixtures[0] = tankBodies[0].createFixture(tankFixDef);
 
         // Add tank
         BodyDef rightTankDef = new BodyDef();
@@ -162,9 +209,10 @@ public class BattleScreen extends ScreenAdapter {
         rightTankDef.position.set(600,110);
         FixtureDef rightTankFixDef = new FixtureDef();
         rightTankFixDef.shape = circleShape;
-        rightTankFixDef.friction = .6f;
+        rightTankFixDef.friction = 0.6f;
         rightTankFixDef.restitution = 0;
-        tankFixtures[1] = world.createBody(rightTankDef).createFixture(rightTankFixDef);
+        tankBodies[1] = world.createBody(rightTankDef);
+        tankFixtures[1] = tankBodies[1].createFixture(rightTankFixDef);
         circleShape.dispose();
     }
 
@@ -233,7 +281,9 @@ public class BattleScreen extends ScreenAdapter {
             cannonBody.applyForce(0, -10, pos.x, pos.y, false);
         }
 
-
+        int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
+        int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
+        tanks[turn].setPosition(tankX, tankY);
         world.step(1/60f, 100, 100);
     }
 }

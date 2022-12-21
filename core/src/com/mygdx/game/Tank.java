@@ -29,4 +29,8 @@ public abstract class Tank {
     public String getTankImage() {
         return tankImage;
     }
+
+    public void setPosition(int x, int y) {
+        this.position = new int[]{x, y};
+    }
 }
