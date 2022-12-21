@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.*;
+import java.util.ArrayList;
+
 
 public class LoadGameScreen extends ScreenAdapter {
 
@@ -24,6 +27,7 @@ public class LoadGameScreen extends ScreenAdapter {
     private Music loadBgm;
     private Stage stage;
     private Skin loadSkin;
+    private ArrayList<String> savedGameNames = new ArrayList<>();
     //Label outputLabel;
 
 
@@ -45,6 +49,34 @@ public class LoadGameScreen extends ScreenAdapter {
         //stage for buttons
         stage = new Stage(new ScreenViewport());
         loadSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+
+        File folder = new File("savedGames");
+        savedGameNames.clear();
+        File[] files = folder.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile()) {
+                savedGameNames.add("savedGames/" + files[i].getName());
+            }
+        }
+    }
+
+    public void loadGame(String path){
+        try{
+            FileInputStream file = new FileInputStream(path);
+            ObjectInputStream in = new ObjectInputStream(file);
+
+            // Method for deserialization of object
+            this.game.setGameData((GameData)in.readObject());
+            in.close();
+            file.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        game.setScreen(new BattleScreen(game));
     }
 
     @Override
@@ -65,7 +97,7 @@ public class LoadGameScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                if (savedGameNames.size() >= 1) loadGame(savedGameNames.get(0));
             }
 
         });
@@ -78,7 +110,7 @@ public class LoadGameScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                if (savedGameNames.size() >= 2) loadGame(savedGameNames.get(1));
             }
 
         });
@@ -91,7 +123,7 @@ public class LoadGameScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                if (savedGameNames.size() >= 3) loadGame(savedGameNames.get(2));
             }
 
         });
@@ -104,7 +136,7 @@ public class LoadGameScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                if (savedGameNames.size() >= 4) loadGame(savedGameNames.get(3));
             }
 
         });

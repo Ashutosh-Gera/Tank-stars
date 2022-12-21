@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
-public class SpectreTank extends Tank{//tank with fuell
+import java.io.Serializable;
+
+public class SpectreTank extends Tank implements Serializable {//tank with fuell
 
     public SpectreTank() {
         this.maxHealth = 100;

@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
-public class BlazerTank extends Tank{
+import java.io.Serializable;
+
+public class BlazerTank extends Tank implements Serializable {
 
     public BlazerTank() {//tank with high health
         this.maxHealth = 120;

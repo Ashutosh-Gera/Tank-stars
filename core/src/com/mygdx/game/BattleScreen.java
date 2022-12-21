@@ -51,8 +51,6 @@ public class BattleScreen extends ScreenAdapter  {
     private Body tankBodies[] = new Body[2];
     private Fixture cannonFix; private Body cannonBody;
 
-    private int turn = 0; // turn of tank, 0 for left, 1 for right
-
     Skin pauseSkin;
     boolean destroyCannon = false, changeFuel = false;
 
@@ -99,7 +97,7 @@ public class BattleScreen extends ScreenAdapter  {
     @Override
     public void show() {
         world = new World(new Vector2(0, -9.81f), true);
-        box2DDebugRenderer = new Box2DDebugRenderer();
+        //box2DDebugRenderer = new Box2DDebugRenderer();
 
         Gdx.input.setInputProcessor(stage);
 
@@ -122,6 +120,7 @@ public class BattleScreen extends ScreenAdapter  {
                 if (cannonBody != null){
                     return;
                 }
+                int turn = game.getGameData().getTurn();
                 float tankX = tankFixtures[turn].getBody().getPosition().x;
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 float rel_x = x - tankX;
@@ -143,8 +142,8 @@ public class BattleScreen extends ScreenAdapter  {
                 cannonBody.applyLinearImpulse(rel_x*impulse_coeff,rel_y*impulse_coeff, tankX, tankY+20, false);
                 circleShape.dispose();
 
-                turn = 1 - turn;
-                tanks[turn].boostFuel();
+                game.getGameData().switchTurn();
+                tanks[game.getGameData().getTurn()].boostFuel();
             }
         });
 
@@ -153,6 +152,7 @@ public class BattleScreen extends ScreenAdapter  {
             @Override
             public boolean keyDown(InputEvent event, int keycode)
             {
+                int turn = game.getGameData().getTurn();
                 if (cannonBody != null){
                     return true;
                 }
@@ -188,7 +188,7 @@ public class BattleScreen extends ScreenAdapter  {
                         float tankY = tankFixtures[i].getBody().getPosition().y;
                         float rel_x = cannonFix.getBody().getPosition().x - tankX;
                         float rel_y = cannonFix.getBody().getPosition().y - tankY;
-                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y, tanks[turn].getDestructionPower());
+                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y, tanks[game.getGameData().getTurn()].getDestructionPower());
                         int direction = rel_x > 0? 1:-1;
                         if (-100 < rel_x && rel_x < 100){
                             tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
@@ -238,8 +238,15 @@ public class BattleScreen extends ScreenAdapter  {
         // Add tank
         BodyDef leftTankDef = new BodyDef();
         leftTankDef.type = BodyDef.BodyType.DynamicBody;
-        leftTankDef.position.set(200,110);
-        tanks[0].setPosition(200, 110);
+        int[] pos = tanks[0].getPosition();
+        if (pos[0] == pos[1] && pos[0] == 0){
+            leftTankDef.position.set(200,110);
+            tanks[0].setPosition(200, 110);
+        }
+        else{
+            leftTankDef.position.set(pos[0],pos[1]+10);
+        }
+
         FixtureDef tankFixDef = new FixtureDef();
         tankFixDef.shape = circleShape;
         tankFixDef.friction = 0.6f;
@@ -251,8 +258,14 @@ public class BattleScreen extends ScreenAdapter  {
         // Add tank
         BodyDef rightTankDef = new BodyDef();
         rightTankDef.type = BodyDef.BodyType.DynamicBody;
-        rightTankDef.position.set(600,110);
-        tanks[1].setPosition(600, 110);
+        pos = tanks[1].getPosition();
+        if (pos[0] == pos[1] && pos[0] == 0){
+            rightTankDef.position.set(600,110);
+            tanks[1].setPosition(600, 110);
+        }
+        else{
+            rightTankDef.position.set(pos[0],pos[1]+10);
+        }
         FixtureDef rightTankFixDef = new FixtureDef();
         rightTankFixDef.shape = circleShape;
         rightTankFixDef.friction = 0.6f;
@@ -267,6 +280,7 @@ public class BattleScreen extends ScreenAdapter  {
         float[] arr;
         if (game.getGameData().getTerrainInfo() == null){
             arr = generateGroundVertices(0);//{0,0,100,0,100,100,90,100,80,100,70,100,0,100};
+            this.game.getGameData().setTerrainInfo(arr);
         }
         else{
             arr = game.getGameData().getTerrainInfo();
@@ -306,7 +320,7 @@ public class BattleScreen extends ScreenAdapter  {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         ScreenUtils.clear(135 / 255f, 206 / 255f, 235 / 255f, 1);
-        box2DDebugRenderer.render(world, camera.combined);
+        //box2DDebugRenderer.render(world, camera.combined);
         groundPolygonSpriteBatch.begin();
         groundPolygonSprite.draw(groundPolygonSpriteBatch);
         groundPolygonSpriteBatch.end();
@@ -330,7 +344,7 @@ public class BattleScreen extends ScreenAdapter  {
             shapeRenderer.end();
             cannonBody.applyForce(0, -10, pos.x, pos.y, false);
         }
-
+        int turn = game.getGameData().getTurn();
         int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
         if (cannonBody == null && changeFuel==true){ // cannon is sky

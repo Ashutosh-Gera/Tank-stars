@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
-public abstract class Tank {
-    private int[] position = new int[2];
+import java.io.Serializable;
+
+public abstract class Tank implements Serializable {
+    private int[] position = {0, 0};
     protected int health;
     protected int fuel;
     protected int maxFuel;
@@ -57,5 +59,9 @@ public abstract class Tank {
 
     public int getMaxFuel() {
         return maxFuel;
+    }
+
+    public int[] getPosition() {
+        return this.position;
     }
 }

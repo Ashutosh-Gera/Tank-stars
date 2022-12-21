@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
-public class HeliosTank extends Tank{//tank with high destruction power
+import java.io.Serializable;
+
+public class HeliosTank extends Tank implements Serializable {//tank with high destruction power
 
     public HeliosTank() {
         this.maxHealth = 100;

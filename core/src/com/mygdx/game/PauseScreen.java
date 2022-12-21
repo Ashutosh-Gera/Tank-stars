@@ -55,9 +55,9 @@ public class PauseScreen extends ScreenAdapter {
 
     public void saveGame(){
         try{
-            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss z");
             Date date = new Date(System.currentTimeMillis());
-            FileOutputStream file = new FileOutputStream(formatter.format(date));
+            FileOutputStream file = new FileOutputStream("savedGames/" + formatter.format(date));
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(this.game.getGameData());
             out.close();
