@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.Game;
+
 import java.io.Serializable;
 
 public class GameData implements Serializable {
@@ -7,6 +9,21 @@ public class GameData implements Serializable {
     private Tank[] tanks = new Tank[2];
     private float[] terrainInfo;
     private int turn = 0;
+
+    private static GameData gameData;
+
+    private GameData(){
+
+    }
+    public static void createGameData() {
+        if (gameData == null){
+            gameData = new GameData();
+        }
+    }
+
+    public static GameData getGameData(){
+        return gameData;
+    }
 
     public Tank[] getTanks() {
         return tanks;

@@ -10,7 +10,12 @@ public class TankStarsGame extends Game {
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
 	private BitmapFont font;
-	private GameData gameData = new GameData();
+	private GameData gameData;
+
+	public TankStarsGame(){
+		GameData.createGameData();
+		this.gameData = GameData.getGameData();
+	}
 
 	public SpriteBatch getBatch() {
 		return batch;
