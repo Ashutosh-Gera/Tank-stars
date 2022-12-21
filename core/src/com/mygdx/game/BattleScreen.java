@@ -54,7 +54,7 @@ public class BattleScreen extends ScreenAdapter  {
     private int turn = 0; // turn of tank, 0 for left, 1 for right
 
     Skin pauseSkin;
-    boolean destroyCannon = false;
+    boolean destroyCannon = false, changeFuel = false;
 
 
     public BattleScreen(TankStarsGame game) {
@@ -139,7 +139,7 @@ public class BattleScreen extends ScreenAdapter  {
                 cannonFixDef.restitution = 0;
                 cannonBody = world.createBody(cannon);
                 cannonFix = cannonBody.createFixture(cannonFixDef);
-
+                changeFuel = false;
                 cannonBody.applyLinearImpulse(rel_x*impulse_coeff,rel_y*impulse_coeff, tankX, tankY+20, false);
                 circleShape.dispose();
 
@@ -163,11 +163,13 @@ public class BattleScreen extends ScreenAdapter  {
 
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 if (keycode == 21){
+                    changeFuel = true;
                     if ((turn == 0 && tankX < 50) || (turn == 1 && tankX < 400)){
                         return true;
                     }
                     tankBodies[turn].applyForce(-6000,-1000, tankX, tankY, true);
                 } else if (keycode == 22){
+                    changeFuel = true;
                     if ((turn == 0 && tankX > 400) || (turn == 1 && tankX > 750)){
                         return true;
                     }
@@ -331,9 +333,11 @@ public class BattleScreen extends ScreenAdapter  {
 
         int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
-        if (cannonBody == null){ // cannon is sky
+        if (cannonBody == null && changeFuel==true){ // cannon is sky
             tanks[turn].changePosition(tankX, tankY);
         }
+        tanks[0].setPosition((int)tankFixtures[0].getBody().getPosition().x, (int)tankFixtures[0].getBody().getPosition().y);
+        tanks[1].setPosition((int)tankFixtures[1].getBody().getPosition().x, (int)tankFixtures[1].getBody().getPosition().y);
 
         healths[0].begin(ShapeRenderer.ShapeType.Filled);
         healths[0].setColor(Color.FIREBRICK);
