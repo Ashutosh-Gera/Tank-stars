@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class PauseScreen extends ScreenAdapter  {
+public class PauseScreen extends ScreenAdapter  implements ScreenInterface{
 
     TankStarsGame game;
 

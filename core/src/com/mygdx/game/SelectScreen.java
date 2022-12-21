@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
-public class SelectScreen extends ScreenAdapter {
+public class SelectScreen extends ScreenAdapter implements ScreenInterface{
     private TankStarsGame game;
     private OrthographicCamera camera;
     private Texture screenImg;

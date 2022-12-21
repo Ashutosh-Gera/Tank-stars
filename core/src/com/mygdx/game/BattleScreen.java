@@ -32,7 +32,7 @@ import static java.lang.Math.max;
 
 // Currently after clicking the "Play :D" button we get this BattleScreen file open
 // Make this working and the static GUI part would be completed !!
-public class BattleScreen extends ScreenAdapter  {
+public class BattleScreen extends ScreenAdapter implements ScreenInterface {
 
     private TankStarsGame game;
     private Tank[] tanks;
@@ -384,5 +384,10 @@ public class BattleScreen extends ScreenAdapter  {
             cannonBody = null;
             destroyCannon = false;
         }
+    }
+
+    @Override
+    public void dispose(){ //maybe error na aaye isse koi do confirm it
+        stage.dispose();
     }
 }

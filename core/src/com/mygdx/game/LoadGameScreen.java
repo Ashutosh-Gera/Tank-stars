@@ -19,7 +19,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class LoadGameScreen extends ScreenAdapter {
+public class LoadGameScreen extends ScreenAdapter implements ScreenInterface{
 
     private TankStarsGame game;
     private OrthographicCamera camera;
