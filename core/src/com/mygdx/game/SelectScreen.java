@@ -17,12 +17,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
 public class SelectScreen extends ScreenAdapter {
-
     private TankStarsGame game;
-
     private OrthographicCamera camera;
     private Texture screenImg;
-
     private Texture[] tankImgs = new Texture[3];
     private Music screenBgm;
     private Stage stage;

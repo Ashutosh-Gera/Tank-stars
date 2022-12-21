@@ -12,4 +12,7 @@ public class HeliosTank extends Tank implements Serializable {//tank with high d
         this.fuel = 100;
         this.tankImage = "heliosTank.png";
     }
+    public void boostFuel(){
+        this.fuel = this.maxFuel;
+    }
 }

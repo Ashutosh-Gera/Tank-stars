@@ -12,5 +12,8 @@ public class BlazerTank extends Tank implements Serializable {
         this.fuel = 100;
         this.tankImage = "blazerTank.png";
     }
+    public void boostFuel(){
+        this.fuel = this.maxFuel;
+    }
 
 }

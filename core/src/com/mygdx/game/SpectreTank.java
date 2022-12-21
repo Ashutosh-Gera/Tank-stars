@@ -12,4 +12,9 @@ public class SpectreTank extends Tank implements Serializable {//tank with fuell
         this.fuel = 120;
         this.tankImage = "spectreTank.png";
     }
+
+    public void boostFuel(){
+        this.fuel = this.maxFuel;
+    }
+
 }

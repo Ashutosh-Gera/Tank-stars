@@ -11,7 +11,6 @@ public abstract class Tank implements Serializable {
     protected int destructionPower;
     protected String tankImage;
 
-
     public int getHealth() {
         return this.health;
     }
@@ -25,7 +24,7 @@ public abstract class Tank implements Serializable {
     }
 
     public void boostFuel(){
-        this.fuel = this.maxFuel;
+        this.fuel = 100;
     }
 
     public String getTankImage() {
@@ -42,11 +41,15 @@ public abstract class Tank implements Serializable {
     }
 
     public void reduceHealth(float distance, int destructionPower) {
-
         if (destructionPower / distance > 1){
             this.health -= destructionPower / distance;
         }
+    }
 
+    public void reduceHealth(float distance) {
+        if (1400 / distance > 1){
+            this.health -= 1400 / distance;
+        }
     }
 
     public int getDestructionPower() {

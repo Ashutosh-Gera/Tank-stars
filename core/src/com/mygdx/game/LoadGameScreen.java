@@ -60,7 +60,7 @@ public class LoadGameScreen extends ScreenAdapter {
         }
     }
 
-    public void loadGame(String path){
+    public void loadGame(String path) {
         try{
             FileInputStream file = new FileInputStream(path);
             ObjectInputStream in = new ObjectInputStream(file);

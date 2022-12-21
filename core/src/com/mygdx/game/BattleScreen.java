@@ -188,7 +188,12 @@ public class BattleScreen extends ScreenAdapter  {
                         float tankY = tankFixtures[i].getBody().getPosition().y;
                         float rel_x = cannonFix.getBody().getPosition().x - tankX;
                         float rel_y = cannonFix.getBody().getPosition().y - tankY;
-                        tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y, tanks[game.getGameData().getTurn()].getDestructionPower());
+                        if (tanks[game.getGameData().getTurn()].getDestructionPower() != 0){
+                            tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y, tanks[game.getGameData().getTurn()].getDestructionPower());
+                        }
+                        else{
+                            tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y);
+                        }
                         int direction = rel_x > 0? 1:-1;
                         if (-100 < rel_x && rel_x < 100){
                             tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
