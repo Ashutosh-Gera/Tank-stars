@@ -196,11 +196,11 @@ public class BattleScreen extends ScreenAdapter  {
                         }
 
                         if (tanks[i].getHealth() < 0){
-                            System.out.println(i + " Lost");
+                            //System.out.println(i + " Lost");
+                            game.setScreen(new GameOver(game));
                         }
                     }
                     destroyCannon = true;
-
                 }
             }
 

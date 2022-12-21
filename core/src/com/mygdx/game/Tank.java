@@ -40,7 +40,11 @@ public abstract class Tank {
     }
 
     public void reduceHealth(float distance, int destructionPower) {
-        this.health -= destructionPower / distance;
+
+        if (destructionPower / distance > 1){
+            this.health -= destructionPower / distance;
+        }
+
     }
 
     public int getDestructionPower() {
