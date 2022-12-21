@@ -27,6 +27,8 @@ import com.badlogic.gdx.utils.ShortArray;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.lang.Math;
+import java.util.Iterator;
+import java.util.List;
 
 import static java.lang.Math.max;
 
@@ -74,6 +76,7 @@ public class BattleScreen extends ScreenAdapter implements ScreenInterface {
     private float[] generateGroundVertices(int X){
         //int A = 100, B = 80, C = 110;
         float[] vertices = new float[14];
+
         vertices[0] = -350;
         vertices[1] = 0;
         vertices[2] = 1150;
@@ -87,7 +90,6 @@ public class BattleScreen extends ScreenAdapter implements ScreenInterface {
         }
         vertices[6] = 600;
         vertices[7] = 100;
-
         vertices[10] = 200;
         vertices[11] = 100;
 
