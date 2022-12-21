@@ -27,12 +27,13 @@ public class SelectScreen extends ScreenAdapter {
     Music screenBgm;
     Stage stage;
     Skin selectSkin;
+    GameData gameData;
     //Label outputLabel;
 
 
     public SelectScreen(TankStarsGame game) {
         this.game = game;
-
+        this.gameData = game.getGameData();
         //setting the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
@@ -85,7 +86,18 @@ public class SelectScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                //game.setScreen(new BattleScreen(game));
+                System.out.println("1");
+                if (!game.isTankOneInitialised()){
+                    game.setTankOne(new HeliosTank());
+                    game.setScreen(new SelectScreen(game));
+                } else if (!game.isTankTwoInitialised()) {
+                    //System.out.println(game.getGameData());
+                    gameData.setTankTwo(new HeliosTank());
+                    game.setScreen(new BattleScreen(game));
+                } else{
+                    game.setScreen(new BattleScreen(game));
+                }
             }
 
         });
@@ -98,7 +110,15 @@ public class SelectScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                //game.setScreen(new BattleScreen(game));
+                System.out.println("12");
+                if (!game.isTankOneInitialised()){
+                    game.setTankOne(new SpectreTank());
+                    game.setScreen(new SelectScreen(game));
+                } else if (!game.isTankTwoInitialised()) {
+                    gameData.setTankTwo(new SpectreTank());
+                    game.setScreen(new BattleScreen(game));
+                }
             }
 
         });
@@ -111,11 +131,35 @@ public class SelectScreen extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new BattleScreen(game));
+                //game.setScreen(new BattleScreen(game));
+                System.out.println("123");
+                if (!game.isTankOneInitialised()){
+                    game.setTankOne(new BlazerTank());
+                    game.setScreen(new SelectScreen(game));
+                } else if (!game.isTankTwoInitialised()) {
+                    game.setTankTwo(new BlazerTank());
+                    game.setScreen(new BattleScreen(game));
+                }
             }
 
         });
         stage.addActor(playBlazer);
+
+        Button battleStart = new TextButton("START GAME", selectSkin, "small");
+        battleStart.setSize(200, 50);
+        battleStart.setPosition(550, 20);
+        battleStart.setColor(Color.BLACK);
+        battleStart.addListener(new ClickListener(){
+
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (game.isTankOneInitialised() && game.isTankTwoInitialised()){
+                    game.setScreen(new BattleScreen(game));
+                }
+            }
+
+        });
+        stage.addActor(battleStart);
 
 
     }

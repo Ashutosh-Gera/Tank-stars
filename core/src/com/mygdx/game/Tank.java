@@ -1,13 +1,14 @@
 package com.mygdx.game;
 
-public class Tank {
+public abstract class Tank {
     private int[] position;
-    private int health;
-    private int fuel;
+    protected int health;
+    protected int fuel;
     protected int maxFuel;
     protected int maxHealth;
     protected int destructionPower;
-    protected int tankImage;
+    protected String tankImage;
+
 
     public int getHealth() {
         return this.health;
@@ -25,4 +26,7 @@ public class Tank {
         this.fuel = this.maxFuel;
     }
 
+    public String getTankImage() {
+        return tankImage;
+    }
 }
