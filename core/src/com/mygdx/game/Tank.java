@@ -41,6 +41,9 @@ public abstract class Tank {
 
     public void reduceHealth(float distance) {
         this.health -= this.destructionPower / distance;
-        System.out.println(distance);
+    }
+
+    public int getDestructionPower() {
+        return this.destructionPower;
     }
 }

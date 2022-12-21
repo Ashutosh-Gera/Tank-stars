@@ -1,6 +1,9 @@
 package com.mygdx.game;
 
-public class GameData {
+import java.io.Serializable;
+
+public class GameData implements Serializable {
+    static private final long serialVersionUID=42L;
     private Tank[] tanks = new Tank[2];
     private float[] terrainInfo;
 

@@ -54,6 +54,7 @@ public class BattleScreen extends ScreenAdapter  {
     private int turn = 0; // turn of tank, 0 for left, 1 for right
 
     Skin pauseSkin;
+    boolean destroyCannon = false;
 
 
     public BattleScreen(TankStarsGame game) {
@@ -86,7 +87,7 @@ public class BattleScreen extends ScreenAdapter  {
         for (int x=X+800; x>=X; x-=200){
             //y = A*(int)Math.pow(1-x,2) + B*2*x*(1-x) + C*(int)Math.pow(x,2);
             vertices[2*i] = x;
-            vertices[2*i+1] = 100+50*(float)Math.random();
+            vertices[2*i+1] = 100+25*(float)Math.random();
             i++;
         }
         vertices[6] = 600;
@@ -118,21 +119,21 @@ public class BattleScreen extends ScreenAdapter  {
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 float rel_x = x - tankX;
                 float rel_y = y - tankY;
-                float impulse_coeff = 10;
+
+                float impulse_coeff = 1;
                 CircleShape circleShape = new CircleShape();
                 circleShape.setRadius(5f);
                 BodyDef cannon = new BodyDef();
                 cannon.type = BodyDef.BodyType.DynamicBody;
-                cannon.position.set(tankX+10,tankY+10);
+                cannon.position.set(tankX,tankY+20);
                 FixtureDef cannonFixDef = new FixtureDef();
                 cannonFixDef.shape = circleShape;
-                cannonFixDef.friction = .6f;
+                cannonFixDef.friction = 100f;
                 cannonFixDef.restitution = 0;
                 cannonBody = world.createBody(cannon);
                 cannonFix = cannonBody.createFixture(cannonFixDef);
-                cannonBody.setGravityScale(2);
 
-                cannonBody.applyLinearImpulse(rel_x*impulse_coeff,rel_y*impulse_coeff, tankX+10, tankY+10, false);
+                cannonBody.applyLinearImpulse(rel_x*impulse_coeff,rel_y*impulse_coeff, tankX, tankY+20, false);
                 circleShape.dispose();
 
                 turn = 1 - turn;
@@ -145,14 +146,21 @@ public class BattleScreen extends ScreenAdapter  {
             @Override
             public boolean keyDown(InputEvent event, int keycode)
             {
+                float tankX = tankFixtures[turn].getBody().getPosition().x;
                 if (tanks[turn].getFuel() < 0){
                     return true;
                 }
-                float tankX = tankFixtures[turn].getBody().getPosition().x;
+
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 if (keycode == 21){
+                    if (turn == 1 && tankX < 400){
+                        return true;
+                    }
                     tankBodies[turn].applyForce(-6000,-1000, tankX, tankY, true);
                 } else if (keycode == 22){
+                    if (turn == 0 && tankX > 400){
+                        return true;
+                    }
                     tankBodies[turn].applyForce(6000,-1000, tankX, tankY, true);
                 }
                 return true;
@@ -164,14 +172,23 @@ public class BattleScreen extends ScreenAdapter  {
             public void beginContact(Contact contact) {
                 if (contact.getFixtureA() == cannonFix || contact.getFixtureB() == cannonFix){
                     for (int i=0; i<2; i++){
-                        float rel_x = cannonFix.getBody().getPosition().x - tankFixtures[i].getBody().getPosition().x;
-                        float rel_y = cannonFix.getBody().getPosition().y - tankFixtures[i].getBody().getPosition().y;
+                        float tankX = tankFixtures[i].getBody().getPosition().x;
+                        float tankY = tankFixtures[i].getBody().getPosition().y;
+                        float rel_x = cannonFix.getBody().getPosition().x - tankX;
+                        float rel_y = cannonFix.getBody().getPosition().y - tankY;
                         tanks[i].reduceHealth(rel_x*rel_x + rel_y*rel_y);
+                        int direction = rel_x > 0? 1:-1;
+                        if (-100 < rel_x && rel_x < 100){
+                            tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
+                            tankBodies[i].applyForce(-6000*direction,-1000, tankX, tankY, true);
+                        }
+
+                        //tankBodies[i].applyLinearImpulse(1000*direction,-1000, tankX, tankY, true);
                         if (tanks[i].getHealth() < 0){
                             System.out.println(i + " Lost");
                         }
                     }
-                    cannonBody = null;
+                    destroyCannon = true;
 
                 }
             }
@@ -206,7 +223,7 @@ public class BattleScreen extends ScreenAdapter  {
 
     private void addTanks() {
         CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(0.1f);
+        circleShape.setRadius(1f);
         // Add tank
         BodyDef leftTankDef = new BodyDef();
         leftTankDef.type = BodyDef.BodyType.DynamicBody;
@@ -214,7 +231,7 @@ public class BattleScreen extends ScreenAdapter  {
         tanks[0].setPosition(200, 110);
         FixtureDef tankFixDef = new FixtureDef();
         tankFixDef.shape = circleShape;
-        tankFixDef.friction = 5f;
+        tankFixDef.friction = 0.6f;
         tankFixDef.restitution = 0;
         tankBodies[0] = world.createBody(leftTankDef);
         tankFixtures[0] = tankBodies[0].createFixture(tankFixDef);
@@ -236,7 +253,13 @@ public class BattleScreen extends ScreenAdapter  {
     }
 
     private void createGround() {
-        float[] arr = generateGroundVertices(0);//{0,0,100,0,100,100,90,100,80,100,70,100,0,100};
+        float[] arr;
+        if (game.getGameData().getTerrainInfo() == null){
+            arr = generateGroundVertices(0);//{0,0,100,0,100,100,90,100,80,100,70,100,0,100};
+        }
+        else{
+            arr = game.getGameData().getTerrainInfo();
+        }
 
         PolygonShape groundShape = new PolygonShape();
         ShapeRenderer groundFill = new ShapeRenderer();
@@ -303,5 +326,10 @@ public class BattleScreen extends ScreenAdapter  {
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
         tanks[turn].changePosition(tankX, tankY);
         world.step(1/60f, 100, 100);
+        if (destroyCannon){
+            cannonBody.destroyFixture(cannonFix);
+            cannonBody = null;
+            destroyCannon = false;
+        }
     }
 }

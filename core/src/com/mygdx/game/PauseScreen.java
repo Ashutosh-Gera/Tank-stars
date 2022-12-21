@@ -12,6 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 
 public class PauseScreen extends ScreenAdapter {
 
@@ -41,6 +46,20 @@ public class PauseScreen extends ScreenAdapter {
         //stage for buttons
         stage = new Stage(new ScreenViewport());
         pauseSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
+    }
+
+    public void saveGame(){
+        try{
+            FileOutputStream file = new FileOutputStream("abc");
+            ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(this.game.getGameData());
+            out.close();
+            file.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
