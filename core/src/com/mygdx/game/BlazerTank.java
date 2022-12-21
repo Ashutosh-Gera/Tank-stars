@@ -3,11 +3,12 @@ package com.mygdx.game;
 public class BlazerTank extends Tank{
 
     public BlazerTank() {//tank with high health
-        super.maxHealth = 120;
-        super.maxFuel = 100;
-        super.destructionPower = 10;
-        super.health = 120;
-        super.fuel = 100;
+        this.maxHealth = 120;
+        this.maxFuel = 100;
+        this.destructionPower = 10;
+        this.health = 120;
+        this.fuel = 100;
+        this.tankImage = "blazerTank.png";
     }
 
 }

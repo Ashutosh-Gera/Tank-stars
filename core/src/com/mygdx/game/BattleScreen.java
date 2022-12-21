@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.particles.values.RectangleSpawnShapeValue;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.EarClippingTriangulator;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.ShortArray;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -31,35 +33,40 @@ import java.lang.Math;
 // Make this working and the static GUI part would be completed !!
 public class BattleScreen extends ScreenAdapter {
 
-    TankStarsGame game;
-    OrthographicCamera camera;
-    Stage stage;
-    Box2DDebugRenderer box2DDebugRenderer;
-    World world;
-    Texture groundTexture;
-    PolygonSprite groundPolygonSprite;
-    PolygonSpriteBatch groundPolygonSpriteBatch;
+    private TankStarsGame game;
+    private Tank[] tanks;
+    private OrthographicCamera camera;
+    private Stage stage;
+    private Box2DDebugRenderer box2DDebugRenderer;
+    private World world;
+    private Texture groundTexture;
+    private PolygonSprite groundPolygonSprite;
+    private PolygonSpriteBatch groundPolygonSpriteBatch;
 
-    Texture leftHealth;
-    Texture rightHealth;
+    private Texture[] healths = new Texture[2];
+    private Texture[] tankTextures = new Texture[2];
+    private Fixture[] tankFixtures = new Fixture[2];
+    private Fixture cannonFix; private Body cannonBody;
 
-    Texture leftTank; Fixture leftTankFixture;
-    Texture rightTank; Fixture rightTankFixture;
+    int turn = 0; // turn of tank, 0 for left, 1 for right
 
     Skin pauseSkin;
     public BattleScreen(TankStarsGame game) {
         this.game = game;
+        GameData gameData = game.getGameData();
+        Tank[] tanks = gameData.getTanks();
+
         //setting the camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
         stage = new Stage(new ScreenViewport());
         pauseSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
 
-        leftHealth = new Texture(Gdx.files.internal("leftHealth.png"));
-        rightHealth = new Texture(Gdx.files.internal("rightHealth.png"));
-
-        leftTank = new Texture(Gdx.files.internal("blazerTank.png"));
-        rightTank = new Texture(Gdx.files.internal("spectreTank.png"));
+        healths[0] = new Texture(Gdx.files.internal("leftHealth.png"));
+        healths[1] = new Texture(Gdx.files.internal("rightHealth.png"));
+        System.out.println(tanks[0].getTankImage());
+        tankTextures[0] = new Texture(Gdx.files.internal(tanks[0].getTankImage()));
+        tankTextures[1] = new Texture(Gdx.files.internal(tanks[1].getTankImage()));
 
     }
 
@@ -94,6 +101,74 @@ public class BattleScreen extends ScreenAdapter {
 
         Gdx.input.setInputProcessor(stage);
 
+        createGround();
+
+        final Button pauseButton = new TextButton("Pause", pauseSkin, "small");
+        pauseButton.setSize(100, 45);
+        pauseButton.setPosition(350, 435);
+
+        stage.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                float tankX = tankFixtures[turn].getBody().getPosition().x;
+                float tankY = tankFixtures[turn].getBody().getPosition().y;
+                float rel_x = x - tankX;
+                float rel_y = y - tankY;
+                float impulse_coeff = 2;
+                CircleShape circleShape = new CircleShape();
+                circleShape.setRadius(5f);
+                BodyDef cannon = new BodyDef();
+                cannon.type = BodyDef.BodyType.DynamicBody;
+                cannon.position.set(tankX,tankY);
+                FixtureDef cannonFixDef = new FixtureDef();
+                cannonFixDef.shape = circleShape;
+                cannonFixDef.friction = .6f;
+                cannonFixDef.restitution = 0;
+                cannonBody = world.createBody(cannon);
+                cannonFix = cannonBody.createFixture(cannonFixDef);
+
+                cannonBody.applyLinearImpulse(rel_x/impulse_coeff,rel_y/impulse_coeff, tankX, tankY, false);
+                circleShape.dispose();
+            }
+        });
+
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new PauseScreen(game));
+            }
+        });
+        stage.addActor(pauseButton);
+
+        addTanks();
+    }
+
+    private void addTanks() {
+        CircleShape circleShape = new CircleShape();
+        circleShape.setRadius(0.1f);
+        // Add tank
+        BodyDef leftTankDef = new BodyDef();
+        leftTankDef.type = BodyDef.BodyType.DynamicBody;
+        leftTankDef.position.set(200,110);
+        FixtureDef tankFixDef = new FixtureDef();
+        tankFixDef.shape = circleShape;
+        tankFixDef.friction = .6f;
+        tankFixDef.restitution = 0;
+        tankFixtures[0] = world.createBody(leftTankDef).createFixture(tankFixDef);
+
+        // Add tank
+        BodyDef rightTankDef = new BodyDef();
+        rightTankDef.type = BodyDef.BodyType.DynamicBody;
+        rightTankDef.position.set(600,110);
+        FixtureDef rightTankFixDef = new FixtureDef();
+        rightTankFixDef.shape = circleShape;
+        rightTankFixDef.friction = .6f;
+        rightTankFixDef.restitution = 0;
+        tankFixtures[1] = world.createBody(rightTankDef).createFixture(rightTankFixDef);
+        circleShape.dispose();
+    }
+
+    private void createGround() {
         float[] arr = generateGroundVertices(0);//{0,0,100,0,100,100,90,100,80,100,70,100,0,100};
 
         PolygonShape groundShape = new PolygonShape();
@@ -117,49 +192,13 @@ public class BattleScreen extends ScreenAdapter {
 
         ChainShape ground = new ChainShape();
         ground.createChain(arr);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = ground;
-        fixtureDef.friction = .6f;
-        fixtureDef.restitution = 0;
+        FixtureDef groundFixtureDef = new FixtureDef();
+        groundFixtureDef.shape = ground;
+        groundFixtureDef.friction = .6f;
+        groundFixtureDef.restitution = 0;
 
-        world.createBody(bodyDef).createFixture(fixtureDef);
+        Fixture groundFixture = world.createBody(bodyDef).createFixture(groundFixtureDef);
         groundShape.dispose();
-
-        final Button pauseButton = new TextButton("Pause", pauseSkin, "small");
-        pauseButton.setSize(100, 45);
-        pauseButton.setPosition(350, 435);
-
-        pauseButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new PauseScreen(game));
-            }
-        });
-        stage.addActor(pauseButton);
-
-        CircleShape circleShape = new CircleShape();
-        circleShape.setRadius(0.1f);
-
-        // Add tank
-        BodyDef leftTankDef = new BodyDef();
-        leftTankDef.type = BodyDef.BodyType.DynamicBody;
-        leftTankDef.position.set(200,110);
-        FixtureDef tankFixDef = new FixtureDef();
-        tankFixDef.shape = circleShape;
-        tankFixDef.friction = .6f;
-        tankFixDef.restitution = 0;
-        leftTankFixture = world.createBody(leftTankDef).createFixture(tankFixDef);
-
-        // Add tank
-        BodyDef rightTankDef = new BodyDef();
-        rightTankDef.type = BodyDef.BodyType.DynamicBody;
-        rightTankDef.position.set(600,110);
-        FixtureDef rightTankFixDef = new FixtureDef();
-        rightTankFixDef.shape = circleShape;
-        rightTankFixDef.friction = .6f;
-        rightTankFixDef.restitution = 0;
-        rightTankFixture = world.createBody(rightTankDef).createFixture(rightTankFixDef);
-        circleShape.dispose();
     }
 
     @Override
@@ -173,15 +212,28 @@ public class BattleScreen extends ScreenAdapter {
         groundPolygonSpriteBatch.end();
 
         game.batch.begin();
-        game.batch.draw(leftHealth, 0, 434);
-        game.batch.draw(rightHealth, 600, 434);
+        game.batch.draw(healths[0], 0, 434);
+        game.batch.draw(healths[1], 600, 434);
 
-        game.batch.draw(leftTank, leftTankFixture.getBody().getPosition().x, leftTankFixture.getBody().getPosition().y);
-        game.batch.draw(rightTank, rightTankFixture.getBody().getPosition().x, rightTankFixture.getBody().getPosition().y);
+        game.batch.draw(tankTextures[0], tankFixtures[0].getBody().getPosition().x, tankFixtures[0].getBody().getPosition().y);
+        game.batch.draw(tankTextures[1], tankFixtures[1].getBody().getPosition().x, tankFixtures[1].getBody().getPosition().y);
         game.batch.end();
         stage.act(delta);
         stage.draw();
 
-        world.step(1/60f, 16, 6);
+        //Draw cannon
+        if (cannonBody != null){
+            Vector2 pos = cannonBody.getWorldCenter();
+            float angle = cannonBody.getAngle(); //if you need rotation
+            ShapeRenderer shapeRenderer = new ShapeRenderer();
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(220 / 255f, 20 / 255f, 60 / 255f, 1);
+            shapeRenderer.circle(pos.x, pos.y, 5f);
+            shapeRenderer.end();
+            cannonBody.applyForce(0, -10, pos.x, pos.y, false);
+        }
+
+
+        world.step(1/60f, 100, 100);
     }
 }

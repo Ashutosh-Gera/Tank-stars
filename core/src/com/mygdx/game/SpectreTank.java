@@ -2,12 +2,12 @@ package com.mygdx.game;
 
 public class SpectreTank extends Tank{//tank with fuell
 
-
     public SpectreTank() {
-        super.maxHealth = 100;
-        super.maxFuel = 120;
-        super.destructionPower = 10;
-        super.health = 100;
-        super.fuel = 120;
+        this.maxHealth = 100;
+        this.maxFuel = 120;
+        this.destructionPower = 10;
+        this.health = 100;
+        this.fuel = 120;
+        this.tankImage = "spectreTank.png";
     }
 }
