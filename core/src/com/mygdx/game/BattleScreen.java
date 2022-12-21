@@ -76,15 +76,15 @@ public class BattleScreen extends ScreenAdapter  {
     private float[] generateGroundVertices(int X){
         //int A = 100, B = 80, C = 110;
         float[] vertices = new float[14];
-        vertices[0] = X;
+        vertices[0] = -350;
         vertices[1] = 0;
-        vertices[2] = X+800;
+        vertices[2] = 1150;
         vertices[3] = 0;
         int i=2;
-        for (int x=X+800; x>=X; x-=200){
+        for (int x=1000; x>=-200; x-=300){
             //y = A*(int)Math.pow(1-x,2) + B*2*x*(1-x) + C*(int)Math.pow(x,2);
             vertices[2*i] = x;
-            vertices[2*i+1] = 100+25*(float)Math.random();
+            vertices[2*i+1] = 100+50*(float)Math.random();
             i++;
         }
         vertices[6] = 600;
@@ -153,6 +153,9 @@ public class BattleScreen extends ScreenAdapter  {
             @Override
             public boolean keyDown(InputEvent event, int keycode)
             {
+                if (cannonBody != null){
+                    return true;
+                }
                 float tankX = tankFixtures[turn].getBody().getPosition().x;
                 if (tanks[turn].getFuel() < 0){
                     return true;
@@ -160,12 +163,12 @@ public class BattleScreen extends ScreenAdapter  {
 
                 float tankY = tankFixtures[turn].getBody().getPosition().y;
                 if (keycode == 21){
-                    if (turn == 1 && tankX < 400){
+                    if ((turn == 0 && tankX < 50) || (turn == 1 && tankX < 400)){
                         return true;
                     }
                     tankBodies[turn].applyForce(-6000,-1000, tankX, tankY, true);
                 } else if (keycode == 22){
-                    if (turn == 0 && tankX > 400){
+                    if ((turn == 0 && tankX > 400) || (turn == 1 && tankX > 750)){
                         return true;
                     }
                     tankBodies[turn].applyForce(6000,-1000, tankX, tankY, true);
@@ -328,7 +331,9 @@ public class BattleScreen extends ScreenAdapter  {
 
         int tankX = (int)tankFixtures[turn].getBody().getPosition().x;
         int tankY = (int)tankFixtures[turn].getBody().getPosition().y;
-        tanks[turn].changePosition(tankX, tankY);
+        if (cannonBody == null){ // cannon is sky
+            tanks[turn].changePosition(tankX, tankY);
+        }
 
         healths[0].begin(ShapeRenderer.ShapeType.Filled);
         healths[0].setColor(Color.FIREBRICK);
@@ -337,7 +342,7 @@ public class BattleScreen extends ScreenAdapter  {
 
         healths[1].begin(ShapeRenderer.ShapeType.Filled);
         healths[1].setColor(Color.FIREBRICK);
-        healths[1].rect(600, 434, max(200*tanks[1].getHealth()/tanks[1].getMaxHealth(),0), 60);
+        healths[1].rect(800, 434, -max(200*tanks[1].getHealth()/tanks[1].getMaxHealth(),0), 60);
         healths[1].end();
 
         fuels[0].begin(ShapeRenderer.ShapeType.Filled);
@@ -347,7 +352,7 @@ public class BattleScreen extends ScreenAdapter  {
 
         fuels[1].begin(ShapeRenderer.ShapeType.Filled);
         fuels[1].setColor(Color.ORANGE);
-        fuels[1].rect(600, 374, max(200*tanks[1].getFuel()/tanks[1].getMaxFuel(), 0), 60);
+        fuels[1].rect(800, 374, -max(200*tanks[1].getFuel()/tanks[1].getMaxFuel(), 0), 60);
         fuels[1].end();
 
         world.step(1/60f, 100, 100);
