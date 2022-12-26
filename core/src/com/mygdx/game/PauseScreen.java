@@ -57,7 +57,7 @@ public class PauseScreen extends ScreenAdapter  implements ScreenInterface{
         try{
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss z");
             Date date = new Date(System.currentTimeMillis());
-            FileOutputStream file = new FileOutputStream("savedGames/" + formatter.format(date));
+            FileOutputStream file = new FileOutputStream("assets/savedGames/" + formatter.format(date));
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(this.game.getGameData());
             out.close();
@@ -112,7 +112,6 @@ public class PauseScreen extends ScreenAdapter  implements ScreenInterface{
         stage.addActor(exitButton);
         stage.addActor(saveExitButton);
 
-        //not making buttons clickable at this point
     }
 
     @Override

@@ -52,12 +52,12 @@ public class LoadGameScreen extends ScreenAdapter implements ScreenInterface{
         stage = new Stage(new ScreenViewport());
         loadSkin = new Skin(Gdx.files.internal("skin/glassy-ui.json"));
 
-        File folder = new File("savedGames");
+        File folder = new File("assets/savedGames");
         savedGameNames.clear();
         File[] files = folder.listFiles();
         for (int i = 0; i < files.length; i++) {
             if (files[i].isFile()) {
-                savedGameNames.add("savedGames/" + files[i].getName());
+                savedGameNames.add("assets/savedGames/" + files[i].getName());
             }
         }
     }
@@ -176,26 +176,4 @@ public class LoadGameScreen extends ScreenAdapter implements ScreenInterface{
         stage.dispose();
         loadSkin.dispose();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
