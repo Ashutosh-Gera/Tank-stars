@@ -37,12 +37,25 @@ To run the game, download and setup a dev environment for LibGDX from the follow
 ---
 ## Few In-game snapshots:
 
+## TitleScreen
 ![titleScreen](https://user-images.githubusercontent.com/108215446/215802302-dd80e674-3937-41f5-9c89-6004f71cdff5.png)
+
+
+## Select Tank Screen
 ![selectTankScreen](https://user-images.githubusercontent.com/108215446/215802661-aad3fd6a-37b7-4fd1-b40f-8ee2caa462aa.png)
+
+
+## Battle Screen 
 ![battleScreen](https://user-images.githubusercontent.com/108215446/215802716-9dce2759-c1cc-46ce-a2d8-f28bc3f5b0ec.png)
+
+
+## Pause Screen
 ![PauseScreen](https://user-images.githubusercontent.com/108215446/215802746-aea44129-e9ac-4705-a4f9-51c8535474fc.png)
+
+
+## Game Load Screen
 ![LoadGameScreen](https://user-images.githubusercontent.com/108215446/215802769-d74184c3-2fb3-4974-b3bd-62c746c25d10.png)
 
 ---
-## Made with :heart: by [Ashutosh Gera](https://github.com/Ashutosh-Gera) and [Kartik Singhal](https://github.com/kksinghal)
+## Made with :blue_heart: by [Ashutosh Gera](https://github.com/Ashutosh-Gera) and [Kartik Singhal](https://github.com/kksinghal)
 
